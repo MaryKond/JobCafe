@@ -6,50 +6,93 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import Pages.HomePage;
-import org.openqa.selenium.WebElement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FindJobPageTest extends UseCaseBase {
     private static FindJobPage findJobPage;
     private static HomePage homePage;
-    private static final Logger logger= LogManager.getLogger(HomePageTest.class);
-    @BeforeAll
-    public static void classSetUp(){
+    private static final Logger logger = LogManager.getLogger(HomePageTest.class);
 
-        findJobPage=new FindJobPage();
-        homePage=new HomePage();
+    @BeforeAll
+    public static void classSetUp() {
+
+        findJobPage = new FindJobPage();
+        homePage = new HomePage();
     }
+
     @BeforeEach
-    public void beforeTest(){
+    public void beforeTest() {
         homePage.navigateToToHomePage();
         homePage.navigateToFindJob();
     }
 
     @Test
-    public void locationResult(){
+    public void cityResult() {
         findJobPage.sendKeysToLocation();
         String location = findJobPage.getTextLocations();
-       assertEquals(location, "Toronto, Tel-Aviv, Chicago, New-York");
+        assertEquals("Toronto, Tel-Aviv, Chicago, New-York", location);
+        Boolean city = findJobPage.verifyCity();
+        assertTrue(city);
     }
+
+    //TEST HAS ISSUES WITH GETTING RESULTS AFTER SENDING KEYS. REQUIRES CLICKING SEARCH AND MAKING A PAUSE
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     @Test
-    public void positionsResult(){
+    public void companyResult() throws InterruptedException {
+        findJobPage.sendKeysToCompany();
+        String company = findJobPage.getTextCompany();
+        assertEquals("Apple, Facebook, Google", company);
+        Boolean company1 = findJobPage.verifyCompany();
+
+        assertTrue(company1);
+    }
+
+    @Test
+    public void positionResult() {
         findJobPage.sendKeysToPosition();
-        String positons = findJobPage.getTextPositions();
-       assertEquals(positons, "QA, Developer, Project Manager");
-       findJobPage.clickSearch();
+        String position = findJobPage.getTextPositions();
+        assertEquals("QA, Developer, Project Manager", position);
+        Boolean positionName = findJobPage.verifyPosition();
+
+        assertTrue(positionName);
+    }
+
+    @Test
+    public void validRequest() throws InterruptedException {
+        findJobPage.sendKeysToMainFields();
+        String positionNew = findJobPage.getTextPositions();
+        assertEquals("Manager", positionNew);
+
+        String locationNew = findJobPage.getTextLocations();
+        assertEquals("USA", locationNew);
+
+        String companyNew = findJobPage.getTextCompany();
+        assertEquals("Google", companyNew);
+        Boolean validRequest = findJobPage.verifyValidRequest();
+
+        assertTrue(validRequest);
+    }
+
+    @Test
+    public void invalidRequest() throws InterruptedException {
+        findJobPage.sendKeysInvalid();
+        String err = findJobPage.getErrMessage();
+
+        assertEquals("No results found!", err);
     }
     @Test
-    public void cityResult(){
-        findJobPage.sendKeysToLocation();
-        String location = findJobPage.getTextLocations();
-        assertEquals(location, "Toronto, Tel-Aviv, Chicago, New-York");
-      findJobPage.verifyCity();
-//
-////        assertTrue(text.contains("New York") || text.contains("Chicago") || text.contains("Tel-Aviv")|| text.contains("Toronto"),
-////                "Text does not contain any of the three words");
-//
-//        assertTrue(text.contains("er") || text.contains("dfg") || text.contains("sdfg")|| text.contains("sdfg"),
-//                "Text does not contain any of the three words");
+    public void reset() throws InterruptedException {
+        findJobPage.valueToReset();
+       findJobPage.clickReset();
+        String positionNew = findJobPage.getTextPositions();
+        assertEquals("", positionNew);
+        String locationNew = findJobPage.getTextLocations();
+        assertEquals("", locationNew);
+        String companyNew = findJobPage.getTextCompany();
+        assertEquals("", companyNew);
+        String description = findJobPage.getTextDescription();
+        assertEquals("", description);
+
     }
 }
